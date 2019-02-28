@@ -4,20 +4,26 @@
 #'
 #' Small count rounding of necessary inner cells are performed so that all small frequencies of cross-classifications to be published 
 #' (publishable cells) are rounded. This is equivalent to changing micro data since frequencies of unique combinations are changed. 
-#' Thus, additivity and consistency are guaranteed. 
+#' Thus, additivity and consistency are guaranteed. The matrix multiplication formula is: 
+#' \code{yPublish} \code{=} \code{t(x)} \code{\%*\%}  \code{yInner}, where \code{x} is the dummy matrix. 
 #'
 #' @encoding UTF8
 #'
-#' @param data Input data, data.frame or matrix
+#' @param data Input data as a data frame (inner cells)
 #' @param freqVar Variable holding counts (name or number)
-#' @param formula Model formula defining publishable cells
-#' @param roundBase roundBase
+#' @param formula Model formula defining publishable cells. Will be used to calculate \code{x} (via \code{\link{ModelMatrix}}). 
+#' When NULL, x must be supplied.
+#' @param roundBase Rounding base
 #' @param singleRandom Single random draw when TRUE (instead of algorithm)
 #' @param crossTable	When TRUE, cross table in output and caculations via FormulaSums()
 #' @param total	String used to name totals
 #' @param maxIterRows See details
 #' @param maxIter Maximum number of iterations
-#' 
+#' @param x Dummy matrix defining publishable cells
+#' @param hierarchies List of hierarchies, which can be converted by \code{\link{AutoHierarchies}}. 
+#'        Thus, a single string as hierarchy input is assumed to be a total code. 
+#'        Exceptions are \code{"rowFactor"} or \code{""}, which correspond to only using the categories in the data.
+#' @param ... Further parameters sent to \code{\link{Hierarchies2ModelMatrix}}        
 #' @note Iterations are needed since after initial rounding of identified cells, new cells are identified.
 #' If cases of a high number of identified cells the algorithm can be too memory consuming (unless singleRandom=TRUE).
 #' To avoid problems, not more than maxIterRows cells are rounded in each iteration.
@@ -28,58 +34,111 @@
 #' In each matrix the first and the second column contains, respectively, original and rounded values.
 #' By default the cross table is the third element of the output list.
 #' 
-#' @seealso  See Round2() for rounding by other algorithm
+#' @seealso  See the  user-friendly wrapper \code{\link{PLSrounding}}
+#'   and see \code{Round2} for rounding by other algorithm
+#' @importFrom stats as.formula
+#' @importFrom SSBtools FormulaSums matlabColon Hierarchies2ModelMatrix FindHierarchies
+#' @importFrom utils flush.console
+#' @importFrom  Matrix Matrix
+#' @importFrom  methods as
 #' @export
 #'
 #' @examples
+#' # See similar and related examples in PLSrounding documentation
+#' RoundViaDummy(SmallCountData("e6"), "freq")
+#' RoundViaDummy(SmallCountData("e6"), "freq", formula = ~eu * year + geo)
+#' RoundViaDummy(SmallCountData("e6"), "freq", hierarchies = 
+#'    list(geo = c("EU", "@Portugal", "@Spain", "Iceland"), year = c("2018", "2019")))
+#' 
 #' RoundViaDummy(SmallCountData('z2'), 
 #'               'ant', ~region + hovedint + fylke*hovedint + kostragr*hovedint, 10)
 #' mf <- ~region*mnd + hovedint*mnd + fylke*hovedint*mnd + kostragr*hovedint*mnd
 #' a <- RoundViaDummy(SmallCountData('z3'), 'ant', mf, 5)
 #' b <- RoundViaDummy(SmallCountData('sosialFiktiv'), 'ant', mf, 4)
 #' print(cor(b[[2]]),digits=12) # Correlation between original and rounded
-RoundViaDummy <- function(data, freqVar, formula, roundBase = 3, singleRandom = FALSE,
-                          crossTable=TRUE, total = "Total",  maxIterRows = 1000, maxIter = 1E7) {
+RoundViaDummy <- function(data, freqVar, formula = NULL, roundBase = 3, singleRandom = FALSE,
+                          crossTable=TRUE, total = "Total",  maxIterRows = 1000, maxIter = 1E7,
+                          x = NULL,  hierarchies = NULL, ...) {
+
   cat("[")
   flush.console()
-  previous_na_action <- options('na.action')
-  options(na.action='na.pass')
-  cat("{O")
-  flush.console()
-  if(crossTable){
-    formulaSums <- FormulaSums(as.formula(formula), data = data, crossTable=TRUE,total=total,dropResponse=TRUE)
-    x <- formulaSums$modelMatrix
-    crossTab <- formulaSums$crossTable
-    formulaSums <- NULL
+  
+  
+  if (is.null(x) & is.null(formula) & is.null(hierarchies)) {
+    freqVarName <- names(data[1, freqVar, drop = FALSE])
+    hierarchies <- FindHierarchies(data[, !(names(data) %in% freqVarName)])
+    # stop('formula, hierarchies or x needed')
   }
-  else
-    x <- ModelMatrix(as.formula(formula), data = data, sparse = TRUE)
-  cat("}")
-  flush.console()
-  options(na.action=previous_na_action$na.action)
-
+  
+  
+  if (!is.null(hierarchies) & !is.null(formula)) 
+    stop("formula combined with hierarchies is not implemented")
+  
+  
+  if (!is.null(hierarchies) & !is.null(x)) 
+    warning("hierarchies ignored when x is supplied")
+  
+  if (!is.null(hierarchies) & is.null(x)) {
+    x <- Hierarchies2ModelMatrix(data = data, hierarchies = hierarchies, crossTable = crossTable, total = total, ...)
+    crossTable <- x$crossTable
+    x <- x$modelMatrix
+  }
+  
+  ## code below is as before hierarchies introduced 
+  
+  if(!is.null(x) & !is.null(formula))
+    warning("formula ignored when x is supplied")
+  
+  if(is.null(x)){
+    if(length(total)>1){
+      total <- total[1]
+      warning("Only first element of total is used when formula input.")
+    }
+    previous_na_action <- options('na.action')
+    options(na.action='na.pass')
+    cat("{O")
+    flush.console()
+    if(crossTable){
+      formulaSums <- FormulaSums(formula = as.formula(formula), data = data, crossTable=TRUE,total=total,dropResponse=TRUE)
+      x <- formulaSums$modelMatrix
+      crossTab <- formulaSums$crossTable
+      formulaSums <- NULL
+    }
+    else
+      x <- ModelMatrix(as.formula(formula), data = data, sparse = TRUE)
+    cat("}")
+    flush.console()
+    options(na.action=previous_na_action$na.action)
+  } else {
+    if(!is.logical(crossTable))
+      crossTab <- crossTable
+    crossTable <- TRUE
+  }
+  
+  
   #startTime <- Sys.time()
   if(anyNA(x))      # With na.action='na.pass' and sparse = TRUE no NA's will be produced now (zeros instead) - package ‘Matrix’ version 1.2-11
     x[is.na(x)] =0  # The code here is made for possible change in later versions
   #print(difftime(Sys.time(),startTime))
-
+  
   yInner <- data[, freqVar]
-
-
+  
+  
   yPublish <- Matrix::crossprod(x, yInner)[, 1, drop = TRUE]
   a <- PlsRoundSparse(x = x, roundBase = roundBase, yInner = yInner, yPublish = yPublish, singleRandom = singleRandom,maxIter=maxIter, maxIterRows=maxIterRows)
   cat("]\n")
   flush.console()
-
-
+  
+  
   if(crossTable)
     return(list(yInner = IntegerCbind(original = yInner, rounded = a[[1]]),
                 yPublish = cbind(original = yPublish, rounded = a[[2]][, 1, drop = TRUE]),
                 crossTable = crossTab))
-
+  
   list(yInner = IntegerCbind(original = yInner, rounded = a[[1]]),
        yPublish = cbind(original = yPublish, rounded = a[[2]][, 1, drop = TRUE]))
 }
+
 
 
 IntegerCbind = function(original,rounded){ # To ensure integer when integer input
@@ -111,7 +170,7 @@ IntegerCbind = function(original,rounded){ # To ensure integer when integer inpu
 #'   ModelMatrix(~region*hovedint,z1)
 ModelMatrix <- function(formula, data = NULL, mf = model.frame(formula, data = data), allFactor = TRUE, sparse = FALSE, formulaSums=FALSE) {
   if(formulaSums)
-    return(FormulaSums(formula, data = data,
+    return(formula = FormulaSums(formula, data = data,
                                   makeNames=TRUE, crossTable=FALSE, total = "Total", printInc=TRUE,
                                   dropResponse = TRUE))
   for (i in 1:length(mf)) {
@@ -129,23 +188,23 @@ ModelMatrix <- function(formula, data = NULL, mf = model.frame(formula, data = d
 AddEmptyLevel <- function(x) factor(x, levels = c("tullnull", levels(x)))
 
 
-#' PlsRoundSparse
-#'
-#' Avrunder basert på en algoritme inspirert av PLS-regresjon som forutsetter dummy matrise (Model matrix)
-#'
-#' @param x Model matrix
-#' @param roundBase roundBase
-#' @param yInner    inner cells
-#' @param yPublish  cells to be published
-#' @param singleRandom Single random draw when TRUE
-#' @param yInnerExact Original yInner (when iteration)
-#' @param yPublishExact Original yPublish (when iteration)
-#'
-#' @return rounded versions of yInner and yPublish
-#' @importFrom  Matrix Matrix
-#' @importFrom  methods as
-#' 
-#' @keywords internal
+# PlsRoundSparse
+#
+# Avrunder basert på en algoritme inspirert av PLS-regresjon som forutsetter dummy matrise (Model matrix)
+#
+# @param x Model matrix
+# @param roundBase roundBase
+# @param yInner    inner cells
+# @param yPublish  cells to be published
+# @param singleRandom Single random draw when TRUE
+# @param yInnerExact Original yInner (when iteration)
+# @param yPublishExact Original yPublish (when iteration)
+#
+# @return rounded versions of yInner and yPublish
+# @importFrom  Matrix Matrix
+# @importFrom  methods as
+# 
+# @keywords internal
 PlsRoundSparse <- function(x, roundBase = 3, yInner, yPublish = Matrix::crossprod(x, yInner)[, 1, drop = TRUE],
                            singleRandom = FALSE, maxIter = 1E6, maxIterRows = 1000) { # maxIter henger sammen med maxIterRows
 
