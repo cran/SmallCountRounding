@@ -12,6 +12,7 @@
 #' @param hierarchies List of hierarchies
 #' @param formula Model formula defining publishable cells
 #' @param maxRound Inner cells contributing to original publishable cells equal to or less than maxRound will be rounded
+#' @param printInc Printing iteration information to console when TRUE  
 #' @param ... Further parameters sent to \code{RoundViaDummy}  
 #'
 #' @return Output is a four-element list with class attribute "PLSrounded" (to ensure informative printing).
@@ -22,7 +23,7 @@
 #'    \item{metrics}{A named character vector of various statistics calculated from the two output data frames 
 #'    ("\code{inner_}" used to distinguish). See examples below and the function \code{\link{HDutility}}.}
 #'    \item{freqTable}{Matrix of frequencies of cell frequencies and absolute differences.
-#'    For example, row "\code{rounded}" and column "\code{pub.4+}" is the number of rounded 
+#'    For example, row "\code{rounded}" and column "\code{inn.4+}" is the number of rounded 
 #'    inner cell frequencies greater than or equal to \code{4}.}
 #'    
 #' @seealso   \code{\link{RoundViaDummy}}, \code{\link{PLS2way}} 
@@ -30,7 +31,7 @@
 #' @references 
 #' Langsrud, Ø. and Heldal, J. (2018): \dQuote{An Algorithm for Small Count Rounding of Tabular Data}. 
 #' Presented at: \emph{Privacy in statistical databases}, Valencia, Spain. September 26-28, 2018.
-#' \url{https://www.researchgate.net/publication/327768398}
+#' \url{https://www.researchgate.net/publication/327768398_An_Algorithm_for_Small_Count_Rounding_of_Tabular_Data}
 #' 
 #' @encoding UTF8
 #' 
@@ -56,12 +57,13 @@
 #' mean(abs(a$publish[, "difference"]))
 #' sqrt(mean((a$publish[, "difference"])^2))
 #' 
-#' # Four lines below produce equivalent results 
+#' # Five lines below produce equivalent results 
 #' # Ordering of rows can be different
 #' PLSrounding(z, "freq")
 #' PLSrounding(z, "freq", formula = ~eu * year + geo * year)
 #' PLSrounding(z[, -2], "freq", hierarchies = SmallCountData("eHrc"))
 #' PLSrounding(z[, -2], "freq", hierarchies = SmallCountData("eDimList"))
+#' PLSrounding(z[, -2], "freq", hierarchies = SmallCountData("eDimList"), formula = ~geo * year)
 #' 
 #' # Define publishable cells differently by making use of formula interface
 #' PLSrounding(z, "freq", formula = ~eu * year + geo)
@@ -69,6 +71,9 @@
 #' # Define publishable cells differently by making use of hierarchy interface
 #' eHrc2 <- list(geo = c("EU", "@Portugal", "@Spain", "Iceland"), year = c("2018", "2019"))
 #' PLSrounding(z, "freq", hierarchies = eHrc2)
+#' 
+#' # Also possible to combine hierarchies and formula
+#' PLSrounding(z, "freq", hierarchies = SmallCountData("eDimList"), formula = ~geo + year)
 #' 
 #' # Package sdcHierarchies can be used to create hierarchies. 
 #' # The small example code below works if this package is available. 
@@ -97,14 +102,15 @@
 #' set.seed(12345)
 #' a <- PLSrounding(exPSD, "freq", 5, formula = ~rows + cols, zeroCandidates = TRUE)
 #' PLS2way(a)  # (row3, col4): original is 0 and rounded is 5
-PLSrounding <- function(data, freqVar, roundBase = 3, hierarchies = NULL, formula = NULL, maxRound = roundBase-1, ...) {
+PLSrounding <- function(data, freqVar, roundBase = 3, hierarchies = NULL, formula = NULL, 
+                        maxRound = roundBase-1, printInc = nrow(data)>1000, ...) {
   
   
   if(!is.null(list(...)$Version)){   # For testing
     z <- RoundViaDummy_Version_0.3.0(data = data, freqVar = freqVar, formula = formula, roundBase = roundBase, hierarchies = hierarchies, ...) 
   } else {
     z <- RoundViaDummy(data = data, freqVar = freqVar, formula = formula, roundBase = roundBase, hierarchies = hierarchies, 
-                     maxRound = maxRound, ...)
+                     maxRound = maxRound, printInc = printInc, ...)
   }
   
   

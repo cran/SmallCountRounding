@@ -4,8 +4,15 @@
 \alias{ModelMatrix}
 \title{Overparameterized model matrix}
 \usage{
-ModelMatrix(formula, data = NULL, mf = model.frame(formula, data =
-  data), allFactor = TRUE, sparse = FALSE, formulaSums = FALSE)
+ModelMatrix(
+  formula,
+  data = NULL,
+  mf = model.frame(formula, data = data),
+  allFactor = TRUE,
+  sparse = FALSE,
+  formulaSums = FALSE,
+  printInc = FALSE
+)
 }
 \arguments{
 \item{formula}{formula}
@@ -19,6 +26,8 @@ ModelMatrix(formula, data = NULL, mf = model.frame(formula, data =
 \item{sparse}{When TRUE sparse matrix created by sparse.model.matrix()}
 
 \item{formulaSums}{When TRUE, sparse matrix via FormulaSums()}
+
+\item{printInc}{Printing \code{...} to console when TRUE}
 }
 \value{
 model matrix created via model.matrix(), sparse.model.matrix() or FormulaSums()
