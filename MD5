@@ -1,12 +1,12 @@
-d07543f6939f57e8f78f89a01a346b09 *DESCRIPTION
+7798dde0d1ed2af9cc7ef995043cf6ab *DESCRIPTION
 19cbd64715b51267a47bf3750cc6a8a5 *LICENSE
-272f57c44799b943159744938cf37428 *NAMESPACE
-682cd7cff3db3199cef01cc77560a9e1 *NEWS.md
+76267a0b95f822522b6e0a5abea249a3 *NAMESPACE
+09f55af7b82530cab5763108013ed77d *NEWS.md
 8c4bd6c332ed1a940591cd8edf22653c *R/OldVersions.R
 856cf92ac05023375b1ce5a080935b12 *R/PLS2way.R
 4e14a4863b672a056c46f2ca59e6e198 *R/PLSrounding.R
 731abf4b357cd61da66c5557a887adbb *R/Round2.R
-c483d92616b207f649bf5cba08d385ff *R/RoundViaDummy.R
+6ed265b243cf9c9118d1e2f9169714d7 *R/RoundViaDummy.R
 93177aa7d9cc2abf7d07ef8b7670bddc *R/SmallCountData.R
 572e20d1bc7798dcdd2196a520f3f565 *R/SmallCountRounding-package.R
 dc30eba975e6bf382bc59ab9a8227363 *R/aggrtab.R
@@ -34,7 +34,7 @@ ae0ddc1f431920b670b485df7900400a *man/ModelMatrix.Rd
 8fe5ee8856c55705a3c532ec5b7f007d *man/PLS2way.Rd
 f15e053835a930926c34c997383fa197 *man/PLSrounding.Rd
 9d3d41b5d4f7b55245552e554942a7cf *man/Round2.Rd
-0420269c57354231e61a61b639450edb *man/RoundViaDummy.Rd
+48187058227b6838441f96fb8296162d *man/RoundViaDummy.Rd
 aecc1473edfc2d3b174302e435a4db70 *man/RoundViaDummy2.Rd
 513daf4f8f9166ee3bd145a551f3f21b *man/SmallCountData.Rd
 dc37b1765b12486fa223a4ac1f22c513 *man/SmallCountRounding-package.Rd
@@ -45,5 +45,5 @@ aaf1f99e89cf8b9416558e52f5768425 *man/redcube.Rd
 908c37a5a14ebc1070eae976cd10eec1 *man/roundcube.Rd
 0abdd0f54dac01308f639704988dc3f7 *man/sosialFiktiv.Rd
 dc1475e08a858d1048a688abfa7e76a3 *tests/testthat.R
-92f103aa66a537687bd9381dfb2be311 *tests/testthat/test-PLSrounding.R
+ebb005a6ab53c000c041413a802b288f *tests/testthat/test-PLSrounding.R
 4f00b021adf0791de4b0cc546faa901d *vignettes/Introduction_to_SmallCountRounding.Rmd
