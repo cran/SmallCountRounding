@@ -12,11 +12,9 @@ yellow = "#FFFF88"
 green = "#F0FFE9"
 green2 = "#88FF88"
 z <- SmallCountData("exPSD")
-set.seed(12345) 
 a <- PLSrounding(z, "freq", 5)
 k <- PLS2way(a, "original") 
 ka <- PLS2way(a)
-set.seed(12345) 
 b <- PLSrounding(z, "freq", 5, formula = ~rows + cols)
 kb <- PLS2way(b)
 
@@ -25,13 +23,9 @@ e6  <-  SmallCountData("e6")
 
 eDimList <- SmallCountData("eDimList")
 
-set.seed(12345)
 e6a <-  PLSrounding(e6, "freq", 5)
-set.seed(12345)
 e6b <-  PLSrounding(e6, "freq", 5, formula = ~eu * year + geo * year)
-set.seed(12345)
 e6c <-  PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList)
-set.seed(12345)
 e6d <-  PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList, formula = ~geo * year)
 
 
@@ -151,9 +145,10 @@ eDimList
 
 ## ----comment=NA, tidy = FALSE, eval = FALSE-----------------------------------
 #  PLSrounding(e6, "freq", 5)                                                      # a)
-#  PLSrounding(e6, "freq", 5, formula = ~eu * year + geo * year)                   # b)
-#  PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList)                        # c)
-#  PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList, formula = ~geo * year) # d)
+#  PLSrounding(e6, "freq", 5, dimVar = c("geo", "eu", "year"))                     # b)
+#  PLSrounding(e6, "freq", 5, formula = ~eu * year + geo * year)                   # c)
+#  PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList)                        # d)
+#  PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList, formula = ~geo * year) # e)
 
 ## ----comment=NA, tidy = FALSE, eval = TRUE------------------------------------
 out <- PLSrounding(e6[-1, ], "freq", 5, removeEmpty = TRUE, inputInOutput = c(FALSE,TRUE))
