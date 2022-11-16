@@ -1,13 +1,13 @@
-f70419fc275276e6d0209df47130d98c *DESCRIPTION
+db6e79b00285bfd959f741e984c875a8 *DESCRIPTION
 adab0fefd85fd3f17c198b0f606dd72a *NAMESPACE
-d623380cc868ed3fde2a9428185af191 *NEWS.md
+66f1afb1bf6bc75858bb534010d505da *NEWS.md
 029b06afcb474b742a89931a31214946 *R/OldVersions.R
 9d35b42961ba06c66137e4ccf0cbe8c5 *R/PLS2way.R
 fda604f81d0c893d0d05d40a5d00e3a9 *R/PLSrounding.R
 2ac3845abc53e035dbc5c9d0944fcb26 *R/PLSroundingFits.R
 0dc19eeb5bd0cfc9e4614e5b6a2d8b2d *R/PLSroundingLoop.R
 731abf4b357cd61da66c5557a887adbb *R/Round2.R
-b595437c393cd92f66d81e83dd16e417 *R/RoundViaDummy.R
+81580d53ef0938cbd69f28f7913bcd4b *R/RoundViaDummy.R
 40f4433768c02cd85ad1f4c1e12d73cc *R/SmallCountData.R
 572e20d1bc7798dcdd2196a520f3f565 *R/SmallCountRounding-package.R
 bc996536148bc56a0c4387a684ef05c0 *R/aggrtab.R
@@ -18,7 +18,7 @@ afbe4209b3bb961ba3e41cbfe79ea507 *build/partial.rdb
 89390f2a6acdcb76a0d01c9288799960 *build/vignette.rds
 4015b44f97b4385b210d4b0a10d8d757 *inst/doc/Introduction_to_SmallCountRounding.R
 f07b16e007f43dab0d4051b30a29aeaa *inst/doc/Introduction_to_SmallCountRounding.Rmd
-fcb11123c91681fa8196f66a9808e0fa *inst/doc/Introduction_to_SmallCountRounding.html
+3f05bb5ef950146f5897d28b8b630198 *inst/doc/Introduction_to_SmallCountRounding.html
 987f5255bc9d9bcde0d2e6d16edb2953 *man/FindMaxDiff.Rd
 1b2d151953846d247cc20935bc5148ec *man/HDutility.Rd
 e095cd2ffde1bfa2234753307510e63d *man/Lists2formula.Rd

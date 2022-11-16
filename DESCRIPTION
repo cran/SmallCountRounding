@@ -1,8 +1,8 @@
 Package: SmallCountRounding
 Type: Package
 Title: Small Count Rounding of Tabular Data
-Version: 1.0.2
-Date: 2022-10-11
+Version: 1.0.3
+Date: 2022-11-16
 Authors@R: c(person("Øyvind", "Langsrud", role = c("aut", "cre"), email = "oyl@ssb.no"),
              person("Johan", "Heldal", role = c("aut")))
 Author: Øyvind Langsrud [aut, cre],
@@ -19,6 +19,6 @@ BugReports: https://github.com/statisticsnorway/SmallCountRounding/issues
 RoxygenNote: 7.2.1
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2022-10-11 13:31:58 UTC; oyl
+Packaged: 2022-11-16 11:37:33 UTC; oyl
 Repository: CRAN
-Date/Publication: 2022-10-12 12:03:51 UTC
+Date/Publication: 2022-11-16 15:00:17 UTC
