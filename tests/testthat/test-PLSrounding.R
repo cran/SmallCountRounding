@@ -54,6 +54,18 @@ test_that("PLSrounding works", {
   b2 <- PLSrounding(z, "ant2", 50, formula = mf3, leverageCheck = TRUE, printInc = printInc)
   expect_identical(b1,b2)
   
+  
+  # step parameter tests 
+  meanAbsDiffs <- as.numeric(c(
+    PLSrounding(z, "ant", 15, formula = mf3, maxIterRows = 40, printInc = printInc)$metrics["meanAbsDiff"],
+    PLSrounding(z, "ant", 15, formula = mf3, maxIterRows = 40, printInc = printInc, step = list(1,10))$metrics["meanAbsDiff"],
+    PLSrounding(z, "ant", 15, formula = mf3, maxIterRows = 40, printInc = printInc, step = list(1,NULL,1))$metrics["meanAbsDiff"],
+    PLSrounding(z, "ant", 15, formula = mf3, maxIterRows = 40, printInc = printInc, step = list(10))$metrics["meanAbsDiff"],
+    PLSrounding(z, "ant", 15, formula = mf3, maxIterRows = 40, printInc = printInc, step = list(10,NULL,10))$metrics["meanAbsDiff"],
+    PLSrounding(z, "ant", 15, formula = mf3, maxIterRows = 40, printInc = printInc, step = list(1,1,10))$metrics["meanAbsDiff"]))
+  expect_equivalent(meanAbsDiffs, 
+                    c(5.58333333333333, 5.19444444444444, 5.58333333333333, 5.41880341880342, 5.57264957264957, 5.3034188034188))
+  
   z <- z[z$ant>0, ]
   dL <- FindDimLists(z[,-c(3,6,7)])
   a0 <- PLSrounding( z, "ant", hierarchies= dL, formula = ~region*hovedint*mnd-region:hovedint:mnd, printInc = printInc, removeEmpty=FALSE)
@@ -91,10 +103,33 @@ test_that("preAggregate works", {
   aM <- PLSrounding(zM, formula = formula, printInc = printInc)
   aF <- PLSrounding(zF, "freq", formula = formula, printInc = printInc)
   
+  attr(aM$publish, "startRow") <- NULL
+  attr(aF$publish, "startRow") <- NULL
+  
   expect_equal(nrow(aM[[1]]), nrow(zF))
   expect_equal(diff(range(diff(sort(SSBtools::Match(aM[[1]], aF[[1]]))))), 0)
   expect_identical(aM[[2]], aF[[2]][names(aM[[2]])])
   expect_identical(aM[3:4], aF[3:4])
+  
+  zM1 <- cbind(zM, freq = 1L)
+  aM1 <- PLSrounding(zM1, "freq", formula = formula, printInc = printInc, preAggregate = TRUE)
+  attr(aM1$publish, "startRow") <- NULL
+  
+  expect_identical(aM, aM1) 
+  
+  if (requireNamespace("data.table", quietly = TRUE)) {
+    for (aggregateBaseOrder in c(FALSE, TRUE)) {
+      aM <- PLSrounding(zM, formula = formula, printInc = printInc, 
+                        aggregatePackage = "data.table", rowGroupsPackage = "data.table", 
+                        aggregateBaseOrder = aggregateBaseOrder)
+      aM1 <- PLSrounding(zM1, "freq", formula = formula, printInc = printInc, 
+                         preAggregate = TRUE, 
+                         aggregatePackage = "data.table", rowGroupsPackage = "base",
+                         aggregateBaseOrder = aggregateBaseOrder)
+      expect_identical(aM, aM1)
+      expect_identical(aM[3:4], aF[3:4])
+    }
+  }
   
   aM <- PLSrounding(zM, printInc = printInc)
   expect_equal(diff(range(diff(sort(SSBtools::Match(aM[[1]], aF[[1]]))))), 0)
@@ -169,6 +204,7 @@ PLStest = function(..., seed, Version){
   capture.output({ a <- PLSrounding(..., Version = Version, rndSeed = NULL)})
   set.seed(seed)
   b <-PLSrounding(..., printInc = printInc, rndSeed = NULL)
+  attr(b$publish, "startRow") <- NULL
   expect_identical(a,b)
 }
 
