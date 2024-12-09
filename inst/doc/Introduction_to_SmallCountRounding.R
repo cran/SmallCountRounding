@@ -12,7 +12,7 @@ yellow = "#FFFF88"
 green = "#F0FFE9"
 green2 = "#88FF88"
 z <- SmallCountData("exPSD")
-a <- PLSrounding(z, "freq", 5)
+a <- PLSrounding(z, "freq", 5, dimVar = c("rows", "cols"))
 k <- PLS2way(a, "original") 
 ka <- PLS2way(a)
 b <- PLSrounding(z, "freq", 5, formula = ~rows + cols)
@@ -23,7 +23,7 @@ e6  <-  SmallCountData("e6")
 
 eDimList <- SmallCountData("eDimList")
 
-e6a <-  PLSrounding(e6, "freq", 5)
+e6a <-  PLSrounding(e6, "freq", 5, dimVar = c("geo", "eu", "year"))
 e6b <-  PLSrounding(e6, "freq", 5, formula = ~eu * year + geo * year)
 e6c <-  PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList)
 e6d <-  PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList, formula = ~geo * year)
@@ -86,7 +86,7 @@ z <- SmallCountData("exPSD")
 z
 
 ## ----eval=FALSE, tidy = TRUE--------------------------------------------------
-#  a <- PLSrounding(z, freqVar = "freq", roundBase = 5)
+#  a <- PLSrounding(z, freqVar = "freq", roundBase = 5, dimVar = c("rows", "cols"))
 
 ## ----comment=NA, tidy = TRUE--------------------------------------------------
 a$inner
@@ -144,14 +144,15 @@ eDimList <- SmallCountData("eDimList")
 eDimList
 
 ## ----comment=NA, tidy = FALSE, eval = FALSE-----------------------------------
-#  PLSrounding(e6, "freq", 5)                                                      # a)
+#  #  PLSrounding(e6, "freq", 5) # This is no longer possible. See ver. 1.1.0 news # a)
 #  PLSrounding(e6, "freq", 5, dimVar = c("geo", "eu", "year"))                     # b)
 #  PLSrounding(e6, "freq", 5, formula = ~eu * year + geo * year)                   # c)
 #  PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList)                        # d)
 #  PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList, formula = ~geo * year) # e)
 
 ## ----comment=NA, tidy = FALSE, eval = TRUE------------------------------------
-out <- PLSrounding(e6[-1, ], "freq", 5, removeEmpty = TRUE, inputInOutput = c(FALSE,TRUE))
+out <- PLSrounding(e6[-1, ], "freq", 5, removeEmpty = TRUE, inputInOutput = c(FALSE,TRUE),
+                   dimVar = c("geo", "eu", "year"))
 out
 out$inner
 out$publish

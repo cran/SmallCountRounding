@@ -12,7 +12,7 @@
 
 <meta name="author" content="Øyvind Langsrud and Johan Heldal" />
 
-<meta name="date" content="2024-10-22" />
+<meta name="date" content="2024-12-09" />
 
 <title>Introduction to ‘SmallCountRounding’</title>
 
@@ -564,7 +564,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introduction to ‘SmallCountRounding’</h1>
 <h4 class="author">Øyvind Langsrud and Johan Heldal</h4>
-<h4 class="date">2024-10-22</h4>
+<h4 class="date">2024-12-09</h4>
 
 
 
@@ -980,7 +980,7 @@ Total
 <h2>Rounding all small cells (Table 2)</h2>
 <p>To avoid any small values in the range 1-4 we can use 5 as rounding
 base.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">PLSrounding</span>(z, <span class="at">freqVar =</span> <span class="st">&quot;freq&quot;</span>, <span class="at">roundBase =</span> <span class="dv">5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">PLSrounding</span>(z, <span class="at">freqVar =</span> <span class="st">&quot;freq&quot;</span>, <span class="at">roundBase =</span> <span class="dv">5</span>, <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;rows&quot;</span>, <span class="st">&quot;cols&quot;</span>))</span></code></pre></div>
 <p>The result is given in Table 2 and can bee seen in the output
 elements below.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a<span class="sc">$</span>inner</span></code></pre></div>
@@ -1697,21 +1697,21 @@ $year
 <code>eDimList$geo</code> is given in Table 5 and
 <code>eDimList$year</code> is a plain hierarchy with total code.</p>
 </div>
-<div id="five-ways-to-produce-table-6" class="section level2">
-<h2>Five ways to produce Table 6</h2>
-<p>The five lines below produce the same results with element
+<div id="four-ways-to-produce-table-6" class="section level2">
+<h2>Four ways to produce Table 6</h2>
+<p>The four lines below produce the same results with element
 <code>publish</code> as in Table 6. Ordering of rows can be
 different.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6, <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>)                                                      <span class="co"># a) </span></span>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#  PLSrounding(e6, &quot;freq&quot;, 5) # This is no longer possible. See ver. 1.1.0 news # a)</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6, <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;geo&quot;</span>, <span class="st">&quot;eu&quot;</span>, <span class="st">&quot;year&quot;</span>))                     <span class="co"># b) </span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6, <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">formula =</span> <span class="sc">~</span>eu <span class="sc">*</span> year <span class="sc">+</span> geo <span class="sc">*</span> year)                   <span class="co"># c)</span></span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6[, <span class="sc">-</span><span class="dv">2</span>], <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">hierarchies =</span> eDimList)                        <span class="co"># d)</span></span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6[, <span class="sc">-</span><span class="dv">2</span>], <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">hierarchies =</span> eDimList, <span class="at">formula =</span> <span class="sc">~</span>geo <span class="sc">*</span> year) <span class="co"># e)</span></span></code></pre></div>
 <ul>
-<li>In a), b) and d), the function uses hierarchies for the
-calculations. In a) and b) the hierarchies are found automatically from
-the input data. In a), <code>dimVar</code> is assumed to be all
-variables except <code>freq</code>.</li>
+<li>In b) and d), the function uses hierarchies for the calculations. In
+b) the hierarchies are found automatically from the input data. In a),
+<code>dimVar</code> is assumed to be all variables except
+<code>freq</code>.</li>
 <li>In c) the cross-classifications are found from the formula. In
 addition, hierarchical relations in the input data are analysed so that
 <code>geo</code> and <code>eu</code> are combined into the same output
@@ -1729,8 +1729,9 @@ avoided by using <code>removeEmpty=TRUE</code>. Note also the parameter
 <code>inputInOutput</code> which can be used to specify whether to
 include codes from input. Below is an example with incomplete input data
 using both these parameters.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">PLSrounding</span>(e6[<span class="sc">-</span><span class="dv">1</span>, ], <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">removeEmpty =</span> <span class="cn">TRUE</span>, <span class="at">inputInOutput =</span> <span class="fu">c</span>(<span class="cn">FALSE</span>,<span class="cn">TRUE</span>))</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>out</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">PLSrounding</span>(e6[<span class="sc">-</span><span class="dv">1</span>, ], <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">removeEmpty =</span> <span class="cn">TRUE</span>, <span class="at">inputInOutput =</span> <span class="fu">c</span>(<span class="cn">FALSE</span>,<span class="cn">TRUE</span>),</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;geo&quot;</span>, <span class="st">&quot;eu&quot;</span>, <span class="st">&quot;year&quot;</span>))</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>out</span></code></pre></div>
 <pre><code>
 PLSrounding summary:  
 
