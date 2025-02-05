@@ -86,7 +86,7 @@ z <- SmallCountData("exPSD")
 z
 
 ## ----eval=FALSE, tidy = TRUE--------------------------------------------------
-#  a <- PLSrounding(z, freqVar = "freq", roundBase = 5, dimVar = c("rows", "cols"))
+# a <- PLSrounding(z, freqVar = "freq", roundBase = 5, dimVar = c("rows", "cols"))
 
 ## ----comment=NA, tidy = TRUE--------------------------------------------------
 a$inner
@@ -95,7 +95,7 @@ a$inner
 a$publish
 
 ## ----eval=FALSE, tidy = TRUE--------------------------------------------------
-#  b <- PLSrounding(z, "freq", 5, formula = ~rows + cols)
+# b <- PLSrounding(z, "freq", 5, formula = ~rows + cols)
 
 ## ----comment=NA, tidy = TRUE--------------------------------------------------
 b$inner
@@ -134,7 +134,7 @@ kable(SmallCountData("eDimList")$geo, "html", caption = "**Table 5**:  Hierarchy
 kable(e6a$publish, "html", caption = "**Table 6**: Ouput data (publish)") %>%
   kable_styling(full_width = F, bootstrap_options = c("bordered"),font_size = 14,  position = "left") %>%
   column_spec(1:2, background = green) %>%
-  cell_background( Match(e6a$inner,e6a$publish),4,c(yellow,green2)[1+(e6a$inner$difference==0)]) 
+  cell_background( SSBtools::Match(e6a$inner,e6a$publish),4,c(yellow,green2)[1+(e6a$inner$difference==0)]) 
 #cell_background( Match(e6a$inner[e6a$inner$difference!=0 , ],e6a$publish),4,yellow) %>%
 #cell_background( Match(e6a$inner[e6a$inner$difference==0 , ],e6a$publish),4,green2) 
 
@@ -144,11 +144,11 @@ eDimList <- SmallCountData("eDimList")
 eDimList
 
 ## ----comment=NA, tidy = FALSE, eval = FALSE-----------------------------------
-#  #  PLSrounding(e6, "freq", 5) # This is no longer possible. See ver. 1.1.0 news # a)
-#  PLSrounding(e6, "freq", 5, dimVar = c("geo", "eu", "year"))                     # b)
-#  PLSrounding(e6, "freq", 5, formula = ~eu * year + geo * year)                   # c)
-#  PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList)                        # d)
-#  PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList, formula = ~geo * year) # e)
+# #  PLSrounding(e6, "freq", 5) # This is no longer possible. See ver. 1.1.0 news # a)
+# PLSrounding(e6, "freq", 5, dimVar = c("geo", "eu", "year"))                     # b)
+# PLSrounding(e6, "freq", 5, formula = ~eu * year + geo * year)                   # c)
+# PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList)                        # d)
+# PLSrounding(e6[, -2], "freq", 5, hierarchies = eDimList, formula = ~geo * year) # e)
 
 ## ----comment=NA, tidy = FALSE, eval = TRUE------------------------------------
 out <- PLSrounding(e6[-1, ], "freq", 5, removeEmpty = TRUE, inputInOutput = c(FALSE,TRUE),
