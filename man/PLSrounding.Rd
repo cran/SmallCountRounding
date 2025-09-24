@@ -18,12 +18,14 @@ PLSrounding(
   printInc = nrow(data) > 1000,
   output = NULL,
   extend0 = FALSE,
-  preAggregate = is.null(freqVar),
+  preAggregate = NA,
   aggregatePackage = "base",
   aggregateNA = TRUE,
   aggregateBaseOrder = FALSE,
   rowGroupsPackage = aggregatePackage,
-  ...
+  ...,
+  action_unused_dots = getOption("SmallCountRounding.action_unused_dots", "inform"),
+  allowed_unused_dots = getOption("SmallCountRounding.allowed_unused_dots", character(0))
 )
 
 PLSroundingInner(..., output = "inner")
@@ -57,7 +59,13 @@ Additionally, \code{extend0} can be specified as a list, representing the \code{
 in the \code{\link[SSBtools]{Extend0}} function.
 Can also be set to \code{"all"} which means that input codes in hierarchies are considered in addition to those in data.}
 
-\item{preAggregate}{When \code{TRUE}, the data will be aggregated beforehand within the function by the dimensional variables.}
+\item{preAggregate}{When \code{TRUE}, the data will be aggregated within the function to an appropriate level.
+This is defined by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula}.
+When \code{FALSE}, no aggregation is performed.
+When \code{NA} (default), the function will automatically decide whether to aggregate:
+aggregation is applied unless \code{freqVar} is present and the data contain no duplicated rows with respect to
+the dimensional variables.
+Exception: if a non-\code{NULL} \code{x} (the model matrix) is supplied via \code{...}, \code{NA} is treated as \code{FALSE}.}
 
 \item{aggregatePackage}{Package used to preAggregate.
 Parameter \code{pkg} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
@@ -75,6 +83,23 @@ The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}}
 via \code{\link[SSBtools]{ModelMatrix}}.}
 
 \item{...}{Further parameters sent to \code{RoundViaDummy}}
+
+\item{action_unused_dots}{Character string controlling how unused arguments
+in \code{...} are handled. Internally uses \code{\link[ellipsis:check_dots_used]{ellipsis::check_dots_used()}} with a
+custom action. One of "warn", "abort", "inform", or "none". The value "none"
+disables the check entirely. The default is taken from
+\code{getOption("SmallCountRounding.action_unused_dots")}, falling back to "warn"
+if the option is not set. Users can change the default globally with e.g.
+\code{options(SmallCountRounding.action_unused_dots = "abort")}.}
+
+\item{allowed_unused_dots}{Character vector of argument names ignored by the
+unused-argument check. May be useful when this function is wrapped by
+another function, or in other cases where a correctly spelled argument is
+nevertheless not registered as used. The default is taken from
+\code{getOption("SmallCountRounding.allowed_unused_dots")}, falling back to
+\code{character(0)} if the option is not set. Users can change the default
+globally with e.g.
+\code{options(SmallCountRounding.allowed_unused_dots = c("plotColor", "lineType"))}.}
 }
 \value{
 Output is a four-element list with class attribute "PLSrounded",

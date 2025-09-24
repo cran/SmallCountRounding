@@ -22,7 +22,13 @@
 #'        Additionally, `extend0` can be specified as a list, representing the `varGroups` parameter 
 #'        in the \code{\link[SSBtools]{Extend0}} function. 
 #'        Can also be set to `"all"` which means that input codes in hierarchies are considered in addition to those in data.   
-#' @param preAggregate When \code{TRUE}, the data will be aggregated beforehand within the function by the dimensional variables. 
+#' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
+#'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula`.
+#'        When `FALSE`, no aggregation is performed. 
+#'        When `NA` (default), the function will automatically decide whether to aggregate: 
+#'        aggregation is applied unless `freqVar` is present and the data contain no duplicated rows with respect to 
+#'        the dimensional variables.  
+#'        Exception: if a non-`NULL` `x` (the model matrix) is supplied via `...`, `NA` is treated as `FALSE`.
 #' @param aggregatePackage Package used to preAggregate. 
 #'                         Parameter `pkg` to \code{\link[SSBtools]{aggregate_by_pkg}}.
 #' @param aggregateNA Whether to include NAs in the grouping variables while preAggregate. 
@@ -35,6 +41,23 @@
 #'               The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}} 
 #'               via \code{\link[SSBtools]{ModelMatrix}}. 
 #' @param ... Further parameters sent to \code{RoundViaDummy}  
+#' 
+#' @param action_unused_dots Character string controlling how unused arguments
+#'   in `...` are handled. Internally uses [ellipsis::check_dots_used()] with a
+#'   custom action. One of "warn", "abort", "inform", or "none". The value "none"
+#'   disables the check entirely. The default is taken from
+#'   `getOption("SmallCountRounding.action_unused_dots")`, falling back to "warn"
+#'   if the option is not set. Users can change the default globally with e.g.
+#'   `options(SmallCountRounding.action_unused_dots = "abort")`.
+#'
+#' @param allowed_unused_dots Character vector of argument names ignored by the
+#'   unused-argument check. May be useful when this function is wrapped by
+#'   another function, or in other cases where a correctly spelled argument is
+#'   nevertheless not registered as used. The default is taken from
+#'   `getOption("SmallCountRounding.allowed_unused_dots")`, falling back to
+#'   `character(0)` if the option is not set. Users can change the default
+#'   globally with e.g.
+#'   `options(SmallCountRounding.allowed_unused_dots = c("plotColor", "lineType"))`.
 #'
 #' @return Output is a four-element list with class attribute "PLSrounded", 
 #'         which ensures informative printing and enables the use of \code{\link[SSBtools]{FormulaSelection}} on this object.
@@ -57,7 +80,7 @@
 #' 
 #' @encoding UTF8
 #' 
-#' @importFrom SSBtools CharacterDataFrame aggregate_by_pkg NamesFromModelMatrixInput Extend0fromModelMatrixInput IsExtend0
+#' @importFrom SSBtools CharacterDataFrame aggregate_by_pkg NamesFromModelMatrixInput Extend0fromModelMatrixInput IsExtend0 CheckInput any_duplicated_rows get_colnames
 #' @importFrom stats as.formula delete.response terms
 #' @export
 #'
@@ -175,19 +198,50 @@ PLSrounding <- function(data, freqVar = NULL, roundBase = 3, hierarchies = NULL,
                         maxRound = roundBase-1, printInc = nrow(data)>1000, 
                         output = NULL, 
                         extend0 = FALSE,
-                        preAggregate = is.null(freqVar),
+                        preAggregate = NA,
                         aggregatePackage = "base",
                         aggregateNA = TRUE,
                         aggregateBaseOrder = FALSE,
                         rowGroupsPackage = aggregatePackage,
-                        ...) {
+                        ...,
+                        action_unused_dots  = getOption("SmallCountRounding.action_unused_dots", "inform"),
+                        allowed_unused_dots = getOption("SmallCountRounding.allowed_unused_dots", character(0))
+                        ) {
   
+  
+  CheckInput(action_unused_dots, type = "character", alt = c("warn", "abort", "inform", "none"), okNULL = FALSE)
   
   force(preAggregate)
   
   if (!hasArg("x")) {
     if (is.null(dimVar) & is.null(hierarchies) & is.null(formula)) {
       stop("dimVar, hierarchies or formula must be specified")
+    }
+  }
+  
+  if (hasArg("roundbase")) {
+    stop('Misspelled parameter "roundbase" found. Use "roundBase".')
+  }
+  
+  # Ensure that dVar is always a character vector of column names,
+  # and not a numeric index (which may cause errors with data.table input)
+  dimVar <- get_colnames(data, cols = dimVar, preserve_NULL = TRUE)
+  
+  dVar <- NamesFromModelMatrixInput(hierarchies = hierarchies, formula = formula, dimVar = dimVar)
+  
+  if (is.na(preAggregate)) {
+    get_x <- function(..., x = NULL) {
+      x
+    }
+    if (!is.null(get_x(...))) {
+      preAggregate <- FALSE
+    } else {
+      preAggregate <- TRUE
+      if (length(freqVar)) {
+        if (any_duplicated_rows(data, cols = dVar) == 0) {
+          preAggregate <- FALSE
+        } 
+      }
     }
   }
   
@@ -212,17 +266,7 @@ PLSrounding <- function(data, freqVar = NULL, roundBase = 3, hierarchies = NULL,
       cat("[preAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
       flush.console()
     }
-    dVar <- NamesFromModelMatrixInput(hierarchies = hierarchies, formula = formula, dimVar = dimVar)
-    if (!length(dVar)) {
-          if (is.null(freqVar)){
-            dVar <- names(data)
-          } else {
-            freqVarName <- names(data[1, freqVar, drop = FALSE])
-            dVar <- names(data[1, !(names(data) %in% freqVarName), drop = FALSE])
-          }
-    }
-    dVar <- unique(dVar)
-    
+
     if (preAggregate) {
       if (is.null(freqVar)) {
         #data <- aggregate(list(f_Re_qVa_r = data[[dVar[1]]]), data[dVar], length)
@@ -289,13 +333,35 @@ PLSrounding <- function(data, freqVar = NULL, roundBase = 3, hierarchies = NULL,
   }
   
   
-  if(!is.null(list(...)$Version)){   # For testing
+  if (hasArg("Version")) {   # For testing
     z <- RoundViaDummy_Version_0.3.0(data = data, freqVar = freqVar, formula = formula, roundBase = roundBase, hierarchies = hierarchies, ...) 
   } else {
     z <- RoundViaDummy(data = data, freqVar = freqVar, formula = formula, roundBase = roundBase, hierarchies = hierarchies,
                        dimVar = dimVar,
                      maxRound = maxRound, printInc = printInc,
                      rowGroupsPackage = rowGroupsPackage, ...)
+  }
+  
+  
+  if(action_unused_dots != "none") {
+    # extra_allowed_unused since these arguments may not be registered as used 
+    # in special cases.
+    extra_allowed_unused <- c(
+      "avoidHierarchical",    # SSBtools::Extend0fromModelMatrixInput and  SSBtools::FormulaSums
+      "hierarchical_extend0"  # SSBtools::Extend0fromModelMatrixInput
+    )
+    allowed_unused_dots <- unique(c(allowed_unused_dots, extra_allowed_unused)) 
+    if (hasArg("avoidHierarchical") & hasArg("avoid_hierarchical")) {   
+      # i.e. called from SSBtools::tables_by_formulas()
+      allowed_unused_dots <- unique(c(allowed_unused_dots, "avoid_hierarchical"))
+    }
+    rlang_warn_extra <- generate_rlang_warn_extra(action_unused_dots, 
+                                                  note = "See arguments `action_unused_dots` and `allowed_unused_dots` in `?PLSrounding`.")
+    ellipsis::check_dots_used(action = rlang_warn_extra)
+    if (length(allowed_unused_dots)) {
+      touch_dots <- generate_touch_dots(allowed_unused_dots)
+      touch_dots(...)
+    }
   }
   
   
@@ -507,5 +573,26 @@ HDutility <- function(f, g){
 
 
 
+
+# The function generated by generate_rlang_warn_extra()
+# Included here to avoid: All declared Imports should be used.
+rlang_warn_extra <- function(message = NULL, ...) {
+  message <- c(message, i = "See arguments `action_unused_dots` and `allowed_unused_dots`.")
+  rlang::warn(message, ...)
+}
+
+generate_rlang_warn_extra <- function(
+    action_unused_dots = "warn",
+    note = "See arguments `action_unused_dots` and `allowed_unused_dots`.", 
+    envir = parent.frame()) {
+  fun_txt <- paste0("function (message = NULL, ...) { \n message <- c(message, i = \"", note, "\") \n  rlang::", action_unused_dots,"(message, ...) \n }")
+  eval(parse(text = fun_txt), envir = envir)
+}
+
+generate_touch_dots <- function(allowed_unused_dots, envir = parent.frame()){
+  a <- allowed_unused_dots
+  fun_txt <- paste("function(", paste(paste(a,"= 1"), collapse = ", "), ", ...){\n ", paste(paste("force(", a, ")"), collapse = "\n "), "\n }")
+  eval(parse(text = fun_txt), envir = envir)
+}
 
 

@@ -12,7 +12,6 @@
 
 <meta name="author" content="Øyvind Langsrud and Johan Heldal" />
 
-<meta name="date" content="2025-02-05" />
 
 <title>Introduction to ‘SmallCountRounding’</title>
 
@@ -275,7 +274,7 @@ overflow: visible;
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -286,7 +285,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -564,7 +563,6 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introduction to ‘SmallCountRounding’</h1>
 <h4 class="author">Øyvind Langsrud and Johan Heldal</h4>
-<h4 class="date">2025-02-05</h4>
 
 
 
@@ -956,9 +954,9 @@ Total
 </div>
 <div id="the-example-dataset-in-table-1" class="section level2">
 <h2>The example dataset in Table 1</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SmallCountRounding)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">SmallCountData</span>(<span class="st">&quot;exPSD&quot;</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>z</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(SmallCountRounding)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">SmallCountData</span>(<span class="st">&quot;exPSD&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>z</span></code></pre></div>
 <pre><code>   rows cols freq
 1  row1 col1    6
 2  row2 col1    1
@@ -980,10 +978,10 @@ Total
 <h2>Rounding all small cells (Table 2)</h2>
 <p>To avoid any small values in the range 1-4 we can use 5 as rounding
 base.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">PLSrounding</span>(z, <span class="at">freqVar =</span> <span class="st">&quot;freq&quot;</span>, <span class="at">roundBase =</span> <span class="dv">5</span>, <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;rows&quot;</span>, <span class="st">&quot;cols&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">PLSrounding</span>(z, <span class="at">freqVar =</span> <span class="st">&quot;freq&quot;</span>, <span class="at">roundBase =</span> <span class="dv">5</span>, <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;rows&quot;</span>, <span class="st">&quot;cols&quot;</span>))</span></code></pre></div>
 <p>The result is given in Table 2 and can bee seen in the output
 elements below.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a<span class="sc">$</span>inner</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>a<span class="sc">$</span>inner</span></code></pre></div>
 <pre><code>   rows cols original rounded difference
 1  row1 col1        6       6          0
 2  row2 col1        1       0         -1
@@ -1000,7 +998,7 @@ elements below.</p>
 13 row1 col5        4       5          1
 14 row2 col5        2       0         -2
 15 row3 col5        2       5          3</code></pre>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>a<span class="sc">$</span>publish</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>a<span class="sc">$</span>publish</span></code></pre></div>
 <pre><code>    rows  cols original rounded difference
 1  Total Total       27      26         -1
 2  Total  col1        7       6         -1
@@ -1039,10 +1037,10 @@ counts.</p>
 <p>Assuming only row and column totals to be published, the publishable
 cells can be defined by the formula <code>~rows+cols</code>. Rounding
 can now be performed by:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">PLSrounding</span>(z, <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">formula =</span> <span class="sc">~</span>rows <span class="sc">+</span> cols)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">PLSrounding</span>(z, <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">formula =</span> <span class="sc">~</span>rows <span class="sc">+</span> cols)</span></code></pre></div>
 <p>The result is given in Table 3 and can bee seen in the output
 elements below.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>b<span class="sc">$</span>inner</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>b<span class="sc">$</span>inner</span></code></pre></div>
 <pre><code>   rows cols original rounded difference
 1  row1 col1        6       6          0
 2  row2 col1        1       1          0
@@ -1059,7 +1057,7 @@ elements below.</p>
 13 row1 col5        4       4          0
 14 row2 col5        2       2          0
 15 row3 col5        2       0         -2</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>b<span class="sc">$</span>publish</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>b<span class="sc">$</span>publish</span></code></pre></div>
 <pre><code>   rows  cols original rounded difference
 1 Total Total       27      28          1
 2  row1 Total       14      15          1
@@ -1085,7 +1083,7 @@ documentation of <code>rndSeed</code>, a parameter to
 <h2>The output object</h2>
 <p>The result of printing the output from <code>PLSrounding</code> is
 (<code>a</code> and <code>b</code> as above):</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>a</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>a</span></code></pre></div>
 <pre><code>
 PLSrounding summary:  
 
@@ -1098,7 +1096,7 @@ Frequencies of cell frequencies and absolute differences:
 original     3      11     .      1      15     3      14     1      6      24
 rounded     10       .     4      1      15    11       .     8      5      24
 absDiff      4      11     .      .      15     5      19     .      .      24</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>b</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>b</span></code></pre></div>
 <pre><code>
 PLSrounding summary:  
 
@@ -1122,14 +1120,14 @@ rounded inner cell frequencies greater than or equal to 6. The last row
 (<code>absDiff</code>) is based on the differences without signs.</p>
 <p>It is possible to compute manually the printed utility measures
 by:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> b<span class="sc">$</span>publish<span class="sc">$</span>original</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> b<span class="sc">$</span>publish<span class="sc">$</span>rounded</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">maxdiff        =</span>  <span class="fu">max</span>(<span class="fu">abs</span>(g <span class="sc">-</span> f)), </span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">HDutility      =</span>  <span class="fu">HDutility</span>(f, g), </span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">meanAbsDiff    =</span>  <span class="fu">mean</span>(<span class="fu">abs</span>(g <span class="sc">-</span> f)), </span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">rootMeanSquare =</span>  <span class="fu">sqrt</span>(<span class="fu">mean</span>((g <span class="sc">-</span> f)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>))</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>f <span class="ot">&lt;-</span> b<span class="sc">$</span>publish<span class="sc">$</span>original</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>g <span class="ot">&lt;-</span> b<span class="sc">$</span>publish<span class="sc">$</span>rounded</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">c</span>(</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>  <span class="at">maxdiff        =</span>  <span class="fu">max</span>(<span class="fu">abs</span>(g <span class="sc">-</span> f)), </span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>  <span class="at">HDutility      =</span>  <span class="fu">HDutility</span>(f, g), </span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>  <span class="at">meanAbsDiff    =</span>  <span class="fu">mean</span>(<span class="fu">abs</span>(g <span class="sc">-</span> f)), </span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>  <span class="at">rootMeanSquare =</span>  <span class="fu">sqrt</span>(<span class="fu">mean</span>((g <span class="sc">-</span> f)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>))</span></code></pre></div>
 <pre><code>       maxdiff      HDutility    meanAbsDiff rootMeanSquare 
       2.000000       0.940951       1.000000       1.201850 </code></pre>
 <p>These measures are also found in the output element
@@ -1138,7 +1136,7 @@ by:</p>
 about the utility measure based on the Hellinger distance.</p>
 <p>Apart from printing, output is a usual list and <code>summary</code>
 works as usual.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(b)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">summary</span>(b)</span></code></pre></div>
 <pre><code>          Length Class      Mode   
 inner      5     data.frame list   
 publish    5     data.frame list   
@@ -1676,9 +1674,9 @@ Spain
 </div>
 <div id="data-table-4-and-hierarchies-table-5" class="section level2">
 <h2>Data (Table 4) and hierarchies (Table 5)</h2>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>e6 <span class="ot">&lt;-</span> <span class="fu">SmallCountData</span>(<span class="st">&quot;e6&quot;</span>)  <span class="co"># As Table 4 </span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>eDimList <span class="ot">&lt;-</span> <span class="fu">SmallCountData</span>(<span class="st">&quot;eDimList&quot;</span>)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>eDimList</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>e6 <span class="ot">&lt;-</span> <span class="fu">SmallCountData</span>(<span class="st">&quot;e6&quot;</span>)  <span class="co"># As Table 4 </span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>eDimList <span class="ot">&lt;-</span> <span class="fu">SmallCountData</span>(<span class="st">&quot;eDimList&quot;</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>eDimList</span></code></pre></div>
 <pre><code>$geo
   levels    codes
 1      @    Total
@@ -1702,11 +1700,11 @@ $year
 <p>The four lines below produce the same results with element
 <code>publish</code> as in Table 6. Ordering of rows can be
 different.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#  PLSrounding(e6, &quot;freq&quot;, 5) # This is no longer possible. See ver. 1.1.0 news # a)</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6, <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;geo&quot;</span>, <span class="st">&quot;eu&quot;</span>, <span class="st">&quot;year&quot;</span>))                     <span class="co"># b) </span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6, <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">formula =</span> <span class="sc">~</span>eu <span class="sc">*</span> year <span class="sc">+</span> geo <span class="sc">*</span> year)                   <span class="co"># c)</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6[, <span class="sc">-</span><span class="dv">2</span>], <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">hierarchies =</span> eDimList)                        <span class="co"># d)</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6[, <span class="sc">-</span><span class="dv">2</span>], <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">hierarchies =</span> eDimList, <span class="at">formula =</span> <span class="sc">~</span>geo <span class="sc">*</span> year) <span class="co"># e)</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="co">#  PLSrounding(e6, &quot;freq&quot;, 5) # This is no longer possible. See ver. 1.1.0 news # a)</span></span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6, <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;geo&quot;</span>, <span class="st">&quot;eu&quot;</span>, <span class="st">&quot;year&quot;</span>))                     <span class="co"># b) </span></span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6, <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">formula =</span> <span class="sc">~</span>eu <span class="sc">*</span> year <span class="sc">+</span> geo <span class="sc">*</span> year)                   <span class="co"># c)</span></span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6[, <span class="sc">-</span><span class="dv">2</span>], <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">hierarchies =</span> eDimList)                        <span class="co"># d)</span></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="fu">PLSrounding</span>(e6[, <span class="sc">-</span><span class="dv">2</span>], <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">hierarchies =</span> eDimList, <span class="at">formula =</span> <span class="sc">~</span>geo <span class="sc">*</span> year) <span class="co"># e)</span></span></code></pre></div>
 <ul>
 <li>In b) and d), the function uses hierarchies for the calculations. In
 b) the hierarchies are found automatically from the input data. In a),
@@ -1729,9 +1727,9 @@ avoided by using <code>removeEmpty=TRUE</code>. Note also the parameter
 <code>inputInOutput</code> which can be used to specify whether to
 include codes from input. Below is an example with incomplete input data
 using both these parameters.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">PLSrounding</span>(e6[<span class="sc">-</span><span class="dv">1</span>, ], <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">removeEmpty =</span> <span class="cn">TRUE</span>, <span class="at">inputInOutput =</span> <span class="fu">c</span>(<span class="cn">FALSE</span>,<span class="cn">TRUE</span>),</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;geo&quot;</span>, <span class="st">&quot;eu&quot;</span>, <span class="st">&quot;year&quot;</span>))</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>out</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">PLSrounding</span>(e6[<span class="sc">-</span><span class="dv">1</span>, ], <span class="st">&quot;freq&quot;</span>, <span class="dv">5</span>, <span class="at">removeEmpty =</span> <span class="cn">TRUE</span>, <span class="at">inputInOutput =</span> <span class="fu">c</span>(<span class="cn">FALSE</span>,<span class="cn">TRUE</span>),</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>                   <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;geo&quot;</span>, <span class="st">&quot;eu&quot;</span>, <span class="st">&quot;year&quot;</span>))</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>out</span></code></pre></div>
 <pre><code>
 PLSrounding summary:  
 
@@ -1744,14 +1742,14 @@ Frequencies of cell frequencies and absolute differences:
 original     .       2     1      2       5     .       2     .      6       8
 rounded      1       1     1      2       5     2       .     .      6       8
 absDiff      4       1     .      .       5     4       4     .      .       8</code></pre>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>out<span class="sc">$</span>inner</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>out<span class="sc">$</span>inner</span></code></pre></div>
 <pre><code>       geo year original rounded difference
 2 Portugal 2018        3       3          0
 3    Spain 2018        7       7          0
 4  Iceland 2019        1       0         -1
 5 Portugal 2019        5       5          0
 6    Spain 2019        6       6          0</code></pre>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>out<span class="sc">$</span>publish</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>out<span class="sc">$</span>publish</span></code></pre></div>
 <pre><code>    geo  year original rounded difference
 1 Total Total       22      21         -1
 2 Total  2018       10      10          0
